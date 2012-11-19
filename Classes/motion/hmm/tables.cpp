@@ -1,0 +1,144 @@
+/////////////////////////////////////////////////////////////////////////
+//Copyright (C) 2003 Dekang Lin, lindek@cs.ualberta.ca
+//
+//Permission to use, copy, modify, and distribute this software for any
+//purpose is hereby granted without fee, provided that the above
+//copyright notice appear in all copies and that both that copyright
+//notice and this permission notice appear in supporting documentation.
+//No representations about the suitability of this software for any
+//purpose is made. It is provided "as is" without express or implied
+//warranty.
+//
+/////////////////////////////////////////////////////////////////////////
+
+#include <iostream>
+#include <cmath>
+#include <stdlib.h>
+
+#include "tables.h"
+#include "logprobs.h"
+
+const double SMOOTHEDZEROCOUNT = -40;
+
+void TwoDTable::clear() {
+	for (TwoDTable::iterator i = begin(); i != end(); i++) {
+		delete i->second;
+	}
+	map<unsigned long, OneDTable*>::clear();
+	for (map<unsigned long, ULSet*>::iterator j = _possibleContexts.begin();
+			j != _possibleContexts.end(); j++) {
+		delete j->second;
+	}
+	_possibleContexts.clear();
+	_backoff.clear();
+}
+
+TwoDTable::~TwoDTable() {
+	for (TwoDTable::iterator it = begin(); it != end(); it++) {
+		delete it->second;
+	}
+}
+
+ULSet* TwoDTable::getCntx(unsigned long event) {
+	map<unsigned long, ULSet*>::iterator g = _possibleContexts.find(event);
+	if (g == _possibleContexts.end())
+		return 0;
+	else
+		return g->second;
+}
+
+double TwoDTable::get(unsigned long event, unsigned long context) {
+	TwoDTable::iterator f = find(context);
+	if (f == end())
+		return _backoff.get(event);
+	else
+		return f->second->get(event);
+}
+
+void TwoDTable::add(unsigned long context, unsigned long event, double count) {
+	TwoDTable::iterator f = find(context);
+	OneDTable* entry = 0;
+	if (f == end()) {
+		entry = new OneDTable;
+		(*this)[context] = entry;
+	} else
+		entry = f->second;
+	entry->add(event, count);
+	map<unsigned long, ULSet*>::iterator g = _possibleContexts.find(event);
+	ULSet* possCntx = 0;
+	if (g == _possibleContexts.end()) {
+		possCntx = new ULSet;
+		_possibleContexts[event] = possCntx;
+	} else
+		possCntx = g->second;
+	possCntx->insert(context);
+}
+
+void TwoDTable::load(istream& file) {
+	int a, b;
+	double c;
+
+	while (file >> a >> b >> c)
+		add(a, b, log(c));
+}
+
+void TwoDTable::save(ostream& file) {
+	for (TwoDTable::iterator i = begin(); i != end(); i++) {
+		OneDTable& vals = *i->second;
+		for (OneDTable::iterator j = vals.begin(); j != vals.end(); j++)
+			file << i->first << '\t' << j->first << '\t' << exp(j->second) << endl;
+	}
+}
+
+bool TwoDTable::rand(unsigned long curr, unsigned long& next) {
+	TwoDTable::iterator it = find(curr);
+	if (it == end())
+		return false;
+	return it->second->rand(next);
+}
+
+OneDTable::OneDTable() {
+	_smoothedZeroCount = SMOOTHEDZEROCOUNT;
+}
+
+void OneDTable::load(istream& file) {
+	int a;
+	double c;
+	while (file >> a >> c)
+		add(a, log(c));
+}
+
+void OneDTable::save(ostream& file) {
+	for (OneDTable::iterator i = begin(); i != end(); i++)
+		file << i->first << '\t' << exp(i->second) << endl;
+}
+
+double OneDTable::get(unsigned long event) {
+	OneDTable::iterator f = find(event);
+	if (f == end())
+		return smoothedZeroCount();
+	else
+		return f->second;
+}
+
+void OneDTable::add(unsigned long event, double count) {
+	OneDTable::iterator f = find(event);
+	if (f == end())
+		(*this)[event] += count;
+	else
+		f->second = sumLogProb(f->second, count);
+}
+
+bool OneDTable::rand(unsigned long& next) {
+	double p = ((double) ::rand()) / RAND_MAX;
+	double total = 0;
+	for (OneDTable::iterator it = begin(); it != end(); it++) {
+		total += exp(it->second);
+		if (total >= p) {
+			next = it->first;
+			return true;
+		}
+	}
+	return false;
+}
+
