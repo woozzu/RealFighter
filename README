@@ -1,0 +1,10 @@
+To develope our project, take these files.
+1. A directory 'Classes/motion'
+2. A file 'proj.android/src/kr/ac/yonsei/cs/ju6sigan/SensorHelper.java'
+3. Copy these files to exactly same place of your project
+
+Usage
+1. Copy SensorHelper.java to your android project's package 'kr.ac.yonsei.cs.ju6sigan' (exactly)
+2. Call SensorHelper.getInstance(this) in a main activity of the android project.
+3. Use ju6sigan::MotionManager class to take advantage of this module.
+4. For the definition of Motion constants, see 'motion/Common.h'
