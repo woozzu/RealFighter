@@ -12,7 +12,6 @@ namespace ju6sigan
 	enum Motion
 	{
 		HorizontalMotion,
-		VerticalMotion,
 		DiagonalMotion,
 		CircleMotion,
 		MOTION_COUNT,

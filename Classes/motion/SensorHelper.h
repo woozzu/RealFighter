@@ -1,5 +1,5 @@
-#ifndef _SENSOR_HELPER_H_
-#define _SENSOR_HELPER_H_
+#ifndef _JU6SIGAN_SENSOR_HELPER_H_
+#define _JU6SIGAN_SENSOR_HELPER_H_
 
 #include "Common.h"
 

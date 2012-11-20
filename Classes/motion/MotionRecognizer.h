@@ -1,5 +1,5 @@
-#ifndef _MOTION_RECOGNIZER_H_
-#define _MOTION_RECOGNIZER_H_
+#ifndef _JU6SIGAN_MOTION_RECOGNIZER_H_
+#define _JU6SIGAN_MOTION_RECOGNIZER_H_
 
 #include "hmm/hmm.h"
 #include "Common.h"

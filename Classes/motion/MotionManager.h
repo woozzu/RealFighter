@@ -1,5 +1,5 @@
-#ifndef _MOTION_MANAGER_H_
-#define _MOTION_MANAGER_H_
+#ifndef _JU6SIGAN_MOTION_MANAGER_H_
+#define _JU6SIGAN_MOTION_MANAGER_H_
 
 #include "Common.h"
 #include "SensorHelper.h"

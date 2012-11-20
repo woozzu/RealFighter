@@ -1,7 +1,8 @@
 #include "MotionRecognizer.h"
 #include <fstream>
+//#include <stdio.h>
 
-#define MAX_ITERATION			100
+#define MAX_ITERATION			20
 #define ACCELERATION_THRESHOLD	0.3
 #define SQRT2					1.414					
 #define SQRT3					1.732
@@ -39,8 +40,6 @@ namespace ju6sigan
 	
 	MotionRecognizer::MotionRecognizer()
 	{
-		for (int i = 0; i < MOTION_COUNT; i++)
-			m_hmm.push_back(new Hmm(8, 2, CODEBOOK_SIZE));
 		m_sequences = new vector<vector<unsigned long>*>[MOTION_COUNT];
 	}
 	
@@ -50,7 +49,8 @@ namespace ju6sigan
 		for (int i = 0; i < MOTION_COUNT; i++) {
 			for (iter = m_sequences[i].begin(); iter != m_sequences[i].end(); iter++)
 				delete *iter;
-			delete m_hmm[i];
+			if (!m_hmm.empty())
+				delete m_hmm[i];
 		}
 		delete[] m_sequences;
 	}
@@ -67,13 +67,16 @@ namespace ju6sigan
 	
 	void MotionRecognizer::learn()
 	{
+		if (m_hmm.empty()) {
+			for (int i = 0; i < MOTION_COUNT; i++)
+				m_hmm.push_back(new Hmm(8, 2, CODEBOOK_SIZE));
+		}
+		
 		for (int i = 0; i < MOTION_COUNT; i++) {
 			if (m_sequences[i].size() > 0)
 				m_hmm[i]->baumWelch(m_sequences[i], MAX_ITERATION);
 		}
 	}
-	
-#include <stdio.h>
 	
 	Motion MotionRecognizer::recognize(vector<kmVecPair> &data)
 	{
@@ -92,10 +95,12 @@ namespace ju6sigan
 			for (int j = 0; j < seq.size(); j++)
 				m_hmm[i]->addObservation(seq[j]);
 			prob = exp(m_hmm[i]->viterbi() - m_hmm[i]->obsProb());
+			if (isnan(prob))
+				prob = 0;
 			
-			char str[100];
+			/*char str[100];
 			sprintf(str, "%f", prob);
-			CCLog(str);
+			CCLog(str);*/
 			
 			if (prob > maxProb) {
 				maxProb = prob;
@@ -171,17 +176,43 @@ namespace ju6sigan
 	
 	void MotionRecognizer::load()
 	{
+		if (!m_hmm.empty()) {
+			for (int i = 0; i < MOTION_COUNT; i++)
+				delete m_hmm[i];
+			m_hmm.clear();
+		}
+		
+		unsigned long transFileSize;
+		unsigned long emitFileSize;
+		char *transFileData;
+		char *emitFileData;
 		for (int i = 0; i < MOTION_COUNT; i++) {
 			ostringstream transPath;
 			ostringstream emitPath;
 			transPath << "motion/motion_t_" << i << ".dat";
 			emitPath << "motion/motion_e_" << i << ".dat";
-			m_hmm[i]->loadProbs(transPath.str(), emitPath.str());
+			
+			transFileData = (char*)CCFileUtils::sharedFileUtils()->getFileData(
+					transPath.str().c_str(), "r", &transFileSize);
+			emitFileData = (char*)CCFileUtils::sharedFileUtils()->getFileData(
+					emitPath.str().c_str(), "r", &emitFileSize);
+			
+			m_hmm.push_back(new Hmm());
+			m_hmm[i]->loadProbs(transFileData, emitFileData
+					, transFileSize, emitFileSize);
+			
+			if (transFileData != NULL)
+				delete[] transFileData;
+			if (emitFileData != NULL)
+				delete[] emitFileData;
 		}
 	}
 	
 	void MotionRecognizer::save()
 	{
+		if (m_hmm.empty())
+			return;
+		
 		for (int i = 0; i < MOTION_COUNT; i++) {
 			ostringstream transPath;
 			ostringstream emitPath;

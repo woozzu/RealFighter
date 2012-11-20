@@ -1,7 +1,8 @@
 To develope our project, take these files.
 1. A directory 'Classes/motion'
 2. A file 'proj.android/src/kr/ac/yonsei/cs/ju6sigan/SensorHelper.java'
-3. Copy these files to exactly same place of your project
+3. A directory 'Resources/motion'
+4. Copy these files to exactly same place of your project
 
 Usage
 1. Copy SensorHelper.java to your android project's package 'kr.ac.yonsei.cs.ju6sigan' (exactly)

@@ -85,9 +85,6 @@ private:
 	TwoDTable _transition;    // transition probabilities
 	TwoDTable _emission;      // emission probabilities
 	vector<TimeSlot*> _timeSlots; // the time slots
-	int _states;
-	int _steps;
-	int _codes;
 	double _minLogProb;       // log probabilities lower than this are set to 0
 
 	double getTransProb(Transition* trans);
@@ -117,6 +114,8 @@ public:
       files NAME.trans and NAME.emit, where NAME is the value of the
       variable name.*/
 	void loadProbs(string transPath, string emitPath);
+	void loadProbs(const char *transData, const char *emitData
+			, unsigned long transDataSize, unsigned long emitDataSize);
 
 	/** Save the transition and emission probability tables into the
       files NAME.trans and NAME.emit, where NAME is the value of the
@@ -149,5 +148,6 @@ public:
 	void genSeq(vector<unsigned long>& seq);
 
 	Hmm(int states, int steps, int codes);
+	Hmm();
 	~Hmm();
 };

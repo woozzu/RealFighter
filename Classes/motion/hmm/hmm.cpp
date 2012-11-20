@@ -13,6 +13,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <cmath>
 #include <cstdlib>
 
@@ -30,18 +31,20 @@ Transition::Transition(HmmNode* from, HmmNode* to, unsigned long obs) {
 	}
 }
 
+Hmm::Hmm()
+{
+	_minLogProb = log(0.000001);
+}
+
 Hmm::Hmm(int states, int steps, int codes) {
 	_minLogProb = log(0.000001);
-	_states = states;
-	_steps = steps;
-	_codes = codes;
 	
 	_initState = 0;
 	_transition.add(0, 1, 1);
-	for (int i = 1; i <= _states; i++) {
-		int s = _states - i;
-		if (s > _steps)
-			s = _steps;
+	for (int i = 1; i <= states; i++) {
+		int s = states - i;
+		if (s > steps)
+			s = steps;
 		s += 1;
 		
 		double tp = 1.0 / s;
@@ -49,9 +52,9 @@ Hmm::Hmm(int states, int steps, int codes) {
 			_transition.add(i, i + j, log(tp));
 	}
 	
-	double ep = 1.0 / _codes;
-	for (int i = 1; i <= _states; i++) {
-		for (int j = 0; j < _codes; j++)
+	double ep = 1.0 / codes;
+	for (int i = 1; i <= states; i++) {
+		for (int j = 0; j < codes; j++)
 			_emission.add(i, j, log(ep));
 	}
 }
@@ -105,6 +108,7 @@ double Hmm::viterbi() {
 				Transition* trans = ins[i];
 				double logProb = trans->_from->logAlpha() + getTransProb(trans)
 						+ getEmitProb(trans);
+				
 				if (bestTrans == 0 || maxProb < logProb) {
 					bestTrans = trans;
 					maxProb = logProb;
@@ -338,6 +342,17 @@ void Hmm::loadProbs(string transPath, string emitPath) {
 
 	ifstream emitProb(emitPath.c_str());
 	_emission.load(emitProb);
+}
+
+void Hmm::loadProbs(const char *transData, const char *emitData
+		, unsigned long transDataSize, unsigned long emitDataSize)
+{
+	istringstream transStream(string(transData, transDataSize));
+	transStream >> _initState;
+	_transition.load(transStream);
+
+	istringstream emitStream(string(emitData, emitDataSize));
+	_emission.load(emitStream);
 }
 
 void Hmm::saveProbs(string transPath, string emitPath) {
