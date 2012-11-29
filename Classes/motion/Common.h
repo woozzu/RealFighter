@@ -9,6 +9,10 @@ using namespace cocos2d;
 
 namespace ju6sigan
 {
+	/*
+	 * Motion Definition
+	 * User can use this enumerations returned by MotionRecognizer
+	 */
 	enum Motion
 	{
 		HorizontalMotion,
@@ -18,6 +22,10 @@ namespace ju6sigan
 		UnknownMotion
 	};
 	
+	/*
+	 * For inner implementation,
+	 * bind an acceleration vector and a rotation quaterion as one structure.
+	 */
 	typedef struct _kmVecPair
 	{
 		kmVec3 accel;

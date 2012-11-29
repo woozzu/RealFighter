@@ -1,6 +1,7 @@
 #include "SensorHelper.h"
 #include "platform/android/jni/JniHelper.h"
 
+// Class name of android's helper module
 #define CLASS_NAME "kr/ac/yonsei/cs/ju6sigan/SensorHelper"
 
 namespace ju6sigan
@@ -17,6 +18,7 @@ namespace ju6sigan
 	void SensorHelper::enable()
 	{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		// Under android platform, call java method through jni helper.
 		JniMethodInfo t;
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "enable", "()V")) {
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
@@ -31,6 +33,7 @@ namespace ju6sigan
 	void SensorHelper::disable()
 	{
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		// Under android platform, call java method through jni helper.
 		JniMethodInfo t;
 		if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "disable", "()V")) {
 			t.env->CallStaticVoidMethod(t.classID, t.methodID);
@@ -44,6 +47,7 @@ namespace ju6sigan
 	
 	void SensorHelper::onUpdate(float aX, float aY, float aZ, float qX, float qY, float qZ, float qW)
 	{
+		// If capturing was started, save the data in buffer.
 		if (m_isStarted) {
 			kmVecPair vecPair = {{aX, aY, aZ}, {qX, qY, qZ, qW}};
 			m_data.push_back(vecPair);

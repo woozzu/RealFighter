@@ -24,8 +24,11 @@ namespace ju6sigan
 	
 	Motion MotionManager::stopCapture()
 	{
+		// Stop capturing sensor data, and get captured data.
 		vector<kmVecPair> data;
 		m_pSensorHelper->stop(data);
+		
+		// Recognize and return
 		return m_motionRecognizer.recognize(data);
 	}
 	
