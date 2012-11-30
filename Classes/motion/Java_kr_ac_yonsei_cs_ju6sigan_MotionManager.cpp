@@ -1,4 +1,5 @@
 #include "platform/android/jni/JniHelper.h"
+#include "MotionManager.h"
 
 #ifdef __cplusplus
 extern "C" {
