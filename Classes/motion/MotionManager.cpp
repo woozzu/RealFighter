@@ -2,6 +2,15 @@
 
 namespace ju6sigan
 {
+	MotionManager *MotionManager::m_pInstance;
+	
+	MotionManager::getInstance()
+	{
+		if (m_pInstance == NULL)
+			m_pInstance = new MotionManager();
+		return m_pInstance;
+	}
+	
 	MotionManager::MotionManager()
 	{
 		m_pSensorHelper = SensorHelper::getInstance();

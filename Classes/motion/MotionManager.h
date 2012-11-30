@@ -14,7 +14,7 @@ namespace ju6sigan
 	class MotionManager
 	{
 	public:
-		MotionManager();
+		static MotionManager* getInstance();
 		~MotionManager() {}
 		
 		/**
@@ -48,6 +48,9 @@ namespace ju6sigan
 		Motion stopCapture();
 		
 	private:
+		MotionManager();
+		
+		MotionManager *m_pInstance;
 		SensorHelper *m_pSensorHelper;
 		MotionRecognizer m_motionRecognizer;
 	};
