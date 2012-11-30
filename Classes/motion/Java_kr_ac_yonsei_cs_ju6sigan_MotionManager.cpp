@@ -11,6 +11,12 @@ using namespace ju6sigan;
  * These are the implementations of android MotionManager's native method.
  */
 
+void Java_kr_ac_yonsei_cs_ju6sigan_MotionManager_loadData()
+{
+	MotionManager *mm = MotionManager::getInstance();
+	mm->loadData();
+}
+
 void Java_kr_ac_yonsei_cs_ju6sigan_MotionManager_enableSensor()
 {
 	MotionManager *mm = MotionManager::getInstance();

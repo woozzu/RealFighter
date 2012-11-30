@@ -6,6 +6,11 @@ public class MotionManager {
 	public static final int MOTION_DIAGONAL = 1;
 	public static final int MOTION_CIRCLE = 2;
 	public static final int MOTION_UNKNOWN = 4;
+	
+	/**
+	 * Load motion recognition files.
+	 */
+	public native void loadData();
 
 	/**
 	 * Enable device's sensor.
