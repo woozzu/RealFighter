@@ -4,7 +4,7 @@ namespace ju6sigan
 {
 	MotionManager *MotionManager::m_pInstance;
 	
-	MotionManager::getInstance()
+	MotionManager* MotionManager::getInstance()
 	{
 		if (m_pInstance == NULL)
 			m_pInstance = new MotionManager();

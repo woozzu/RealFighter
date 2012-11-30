@@ -50,9 +50,9 @@ namespace ju6sigan
 	private:
 		MotionManager();
 		
-		MotionManager *m_pInstance;
 		SensorHelper *m_pSensorHelper;
 		MotionRecognizer m_motionRecognizer;
+		static MotionManager *m_pInstance;
 	};
 }
 
